@@ -31,9 +31,10 @@ var ImgFigure=React.createClass({
 class AppComponent extends React.Component {
   render() {
     var ImageFigures=[],Controllers=[];
-    ImageFigures.forEach(function(value){
+    imagesData.forEach(function(value){
       ImageFigures.push(<ImgFigure data={value}/>);
     })
+    console.log(ImageFigures);
     return (
       <section className="stage">
           <section className="img-sec">{ImageFigures}</section>
