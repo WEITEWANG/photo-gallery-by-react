@@ -3,6 +3,7 @@ require('styles/App.scss');
 
 import React from 'react'; 
 import ReactDOM from 'react-dom';
+import { lchown } from 'fs';
 // import {findDOMNode} from 'react-dom';
 // 引入imageData数据
 var imagesData=require('../data/imgData.json');
@@ -17,6 +18,8 @@ imagesData=(function genImageUrl(imagesDataArray){
     }
     return imagesDataArray;
 })(imagesData);
+// 获取图片位置的随机数
+var getRangeRandom=(low,high)=>Math.floor(Math.random()*(high-low)+low);
 // let yeomanImage = require('../images/yeoman.png');
 var ImgFigure=React.createClass({
   render(){   
@@ -44,7 +47,7 @@ class AppComponent extends React.Component {
       rightSecX:[0,0],
       y:[0,0]
     },
-    vPosPange:{
+    vPosRange:{
       x:[0,0],
       topY:[0,0]
     }
@@ -64,7 +67,39 @@ class AppComponent extends React.Component {
   @param centerIndex指定居中排布哪个图片
 */
 rerrange(centerIndex){
+    // 获取imgimgsArrangeArr中心位置坐标对象
+    var imgsArrangeArr=this.state.imgsArrangeArr,
+        Constant=this.Constant,
+        centerPos=this.Constant.centerPos,
+        hPosRange=this.Constant.hPosRange,
+        
+        hPosRangeLeftSexX=hPosRange.leftSecX,
+        hPosRangeRightSecX=hPosRange.rightSecX,
+        hPosRangeY=hPosRange.y,
 
+        vPosRange=this.Constant.vPosRange,
+        vPosRangeX=vPosRange.x,
+        vPosRangeY=vPosRange.topY,
+        // 存储图片上方对应的图片状态信息
+        imgsArrangeTopArr=[],
+        // 图片上方区域的数量定义在[0,1]之间
+        imgTopNum=Math.floor(Math.random()*2),
+        // 标记上方图片是从数组图片中哪个位置拿出来的
+        topImgSpliceIndex=0,
+        // 声明数组对象用来存放中心图片位置信息
+        imgsArrangeCenterArr=imgsArrangeArr.splice(centerIndex,1);
+        // 居中centerIndex的图片
+        imgsArrangeCenterArr[0].pos=centerPos;
+        // 取出要布局上侧的图片状态信息
+      topImgSpliceIndex=Math.floor(Math.random()*(imgsArrangeArr.length-imgTopNum));
+      imgsArrangeTopArr=imgsArrangeArr.splice(topImgSpliceIndex,imgTopNum);
+      // 布局位于上侧的图片
+      imgsArrangeTopArr.forEach(function(value,index){
+          imgsArrangeTopArr[index].pos={
+            top:getRangeRandom(vPosRange.topY[0],vPosRange.topY[1]),
+            left:getRangeRandom(vPosRangeX[0],vPosRangeX[1])
+          }
+      })
 };
 //  组件加载之后，为每张图片计算位置的范围
 componentDidMount(){
@@ -73,8 +108,8 @@ componentDidMount(){
   // 获取stage宽高
   stageWidth=stageDOM.scrollWidth,
   stageHeight=stageDOM.scrollHeight,
-  halfStageWidth=Math.ceil(stageWidth/2), 
-  halfStageHeight=Math.ceil(stageHeight/2);
+  halfStageWidth=Math.floor(stageWidth/2), 
+  halfStageHeight=Math.floor(stageHeight/2);
   // console.log(halfStageWidth);
   // console.log(halfStageHeight);
 
@@ -82,8 +117,8 @@ componentDidMount(){
   let imgFigDOM=ReactDOM.findDOMNode(this.refs.imageFigure0),
       imgFigWidth=imgFigDOM.scrollWidth,
       imgFigHeight=imgFigDOM.scrollHeight,
-      halfImgFigWidth=Math.ceil(imgFigWidth/2),
-      halfImgFigHeight=Math.ceil(imgFigHeight/2);
+      halfImgFigWidth=Math.floor(imgFigWidth/2),
+      halfImgFigHeight=Math.floor(imgFigHeight/2);
       // console.log(halfImgFigWidth,halfImgFigHeight);
       // 计算中心图片的位置坐标点
       this.Constant.centerPos={
@@ -98,11 +133,11 @@ componentDidMount(){
       this.Constant.hPosRange.y[0]=-halfImgFigHeight;
       this.Constant.hPosRange.y[1]=stageHeight-halfImgFigHeight;
       // 垂直方向图片位置的取值范围
-      this.Constant.vPosPange.x[0]=halfStageWidth-imgFigWidth;
-      this.Constant.vPosPange.x[1]=halfStageWidth;
+      this.Constant.vPosRange.x[0]=halfStageWidth-imgFigWidth;
+      this.Constant.vPosRange.x[1]=halfStageWidth;
       // 上分区距离topy的取值范围
-      this.Constant.vPosPange.topY[0]=-halfImgFigHeight;
-      this.Constant.vPosPange.topY[1]=halfStageHeight-halfImgFigHeight*3;
+      this.Constant.vPosRange.topY[0]=-halfImgFigHeight;
+      this.Constant.vPosRange.topY[1]=halfStageHeight-halfImgFigHeight*3;
       this.rerrange(0);
 }
 
