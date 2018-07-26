@@ -99,11 +99,11 @@ componentDidMount(){
       this.Constant.hPosRange.y[1]=stageHeight-halfImgFigHeight;
       // 垂直方向图片位置的取值范围
       this.Constant.vPosPange.x[0]=halfStageWidth-imgFigWidth;
-      this.Constant.vPosPange.y[1]=halfStageWidth;
+      this.Constant.vPosPange.x[1]=halfStageWidth;
       // 上分区距离topy的取值范围
       this.Constant.vPosPange.topY[0]=-halfImgFigHeight;
       this.Constant.vPosPange.topY[1]=halfStageHeight-halfImgFigHeight*3;
-
+      this.rerrange(0);
 }
 
 
@@ -112,7 +112,7 @@ componentDidMount(){
   render() {
     var ImageFigures=[],ControllerUnits=[];
     // 为每一个imgFigure生成一个索引
-    imagesData.forEach(function(value,index){
+    imagesData.forEach((value,index)=>{
       // console.log(value);
       if(!this.state.imgsArrangeArr[index]){
         // 初始化图片状态对象
@@ -123,8 +123,8 @@ componentDidMount(){
           }
         }
       }
-      ImageFigures.push(<ImgFigure data={value} key={value.fileName} ref={'imageFigure'+index}/>).bind(this);
-    })
+      ImageFigures.push(<ImgFigure data={value} key={value.fileName} ref={'imageFigure'+index}/>);
+    });
  
     // console.log(ImageFigures);
     return (
