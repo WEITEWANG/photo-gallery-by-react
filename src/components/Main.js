@@ -74,8 +74,7 @@ rerrange(centerIndex){
     var imgsArrangeArr=this.state.imgsArrangeArr,
         Constant=this.Constant,
         centerPos=Constant.centerPos,
-        hPosRange=Constant.hPosRange,
-        
+        hPosRange=Constant.hPosRange,   
         hPosRangeLeftSexX=hPosRange.leftSecX,
         hPosRangeRightSecX=hPosRange.rightSecX,
         hPosRangeY=hPosRange.y,
