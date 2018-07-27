@@ -74,7 +74,7 @@ rerrange(centerIndex){
     var imgsArrangeArr=this.state.imgsArrangeArr,
         Constant=this.Constant,
         centerPos=Constant.centerPos,
-        hPosRange=Constant.hPosRange,   
+        hPosRange=Constant.hPosRange,
         hPosRangeLeftSexX=hPosRange.leftSecX,
         hPosRangeRightSecX=hPosRange.rightSecX,
         hPosRangeY=hPosRange.y,
@@ -98,7 +98,7 @@ rerrange(centerIndex){
       // 布局位于上侧的图片
       imgsArrangeTopArr.forEach(function(value,index){
           imgsArrangeTopArr[index].pos={
-            top:getRangeRandom(vPosRange.topY[0],vPosRange.topY[1]),
+            top:getRangeRandom(vPosRangeY[0],vPosRangeY[1]),
             left:getRangeRandom(vPosRangeX[0],vPosRangeX[1])
           }
       });
