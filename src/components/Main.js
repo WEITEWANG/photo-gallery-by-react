@@ -23,8 +23,20 @@ var getRangeRandom = (low, high) => Math.floor(Math.random() * (high - low) + lo
 function get30DegRandom() {
   return ((Math.random() > 0.5 ? '' : '-') + Math.floor(Math.random() * 30));
 }
+
 // let yeomanImage = require('../images/yeoman.png');
 var ImgFigure = React.createClass({
+  // 点击图片进行翻转
+  handleClick(e) {
+    if(this.props.arrange.isCenter){
+      this.props.inverse();
+    }else{
+      this.props.center();
+    }
+    e.stopPropagation();
+    e.preventDefault();
+    
+  },
   render() {
     var styleObj = {};
     // 如果props属性中指定了这张图片的位置，则使用
@@ -38,13 +50,19 @@ var ImgFigure = React.createClass({
         styleObj[val + 'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
       }.bind(this));
     }
+    if(this.props.arrange.isCenter){
+      styleObj.zIndex=11;
+    }
     var imgFigureClassName = 'img-figure';
     imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse' : '';
     return (
-      <figure className={imgFigureClassName} style={styleObj}>
+      <figure className={imgFigureClassName} style={styleObj} onClick={this.handleClick}>
         <img src={this.props.data.imageURL} alt={this.props.data.title} />
         <figcaption>
-          <h2 className="img-title">{this.props.data.desc}</h2>
+          <h2 className="img-title">{this.props.data.title}</h2>
+          <div className="img-back" onClick={this.handleClick}>
+            <p>{this.props.data.desc}</p>
+          </div>
         </figcaption>
       </figure>
     );
@@ -77,7 +95,8 @@ class AppComponent extends React.Component {
         //     top:'0'
         //   },
         //   rotate:0, //表示旋转角度
-        //   isInverse:false //图片正反面 默认为false
+        //   isInverse:false, //图片正反面 默认为false
+        //   isCenter:false 图片是否居中
         // }
       ]
     }
@@ -95,7 +114,16 @@ class AppComponent extends React.Component {
       });
     }
   }
-
+  /*
+  *利用rearrange函数，居中对应的index图片
+  *@param index,需要被居中的图片对应的图片信息数组的index值
+  *@return {function}
+  */
+ center(index){
+   return ()=>{
+   this.rerrange(index);
+   }
+ }
   /* 重新布局所有图片
     @param centerIndex指定居中排布哪个图片
   */
@@ -120,10 +148,12 @@ class AppComponent extends React.Component {
       topImgSpliceIndex = 0,
       // 声明数组对象用来存放中心图片位置信息
       imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex, 1);
-    // 居中centerIndex的图片
-    imgsArrangeCenterArr[0].pos = centerPos;
-    // 剧中图片centerIndex不需要旋转
-    imgsArrangeCenterArr[0].rotate = 0;
+    // 居中centerIndex的图片, 剧中图片centerIndex不需要旋转
+    imgsArrangeCenterArr[0] ={
+      pos:centerPos,
+      rotate:0,
+      isCenter:true
+    } 
     // 取出要布局上侧的图片状态信息
     topImgSpliceIndex = Math.floor(Math.random() * (imgsArrangeArr.length - imgTopNum));
     imgsArrangeTopArr = imgsArrangeArr.splice(topImgSpliceIndex, imgTopNum);
@@ -134,7 +164,8 @@ class AppComponent extends React.Component {
           top: getRangeRandom(vPosRangeY[0], vPosRangeY[1]),
           left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
         },
-        rotate: get30DegRandom()
+        rotate: get30DegRandom(),
+        isCenter:false
       }
     });
     // 布局左右两侧的图片
@@ -151,7 +182,8 @@ class AppComponent extends React.Component {
           top: getRangeRandom(hPosRangeY[0], hPosRangeY[1]),
           left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
         },
-        rotate: get30DegRandom()
+        rotate: get30DegRandom(),
+        isCenter:false
       }
     }
     // 填充上侧区域
@@ -218,10 +250,11 @@ class AppComponent extends React.Component {
             top: 0
           },
           rotate: 0,
-          isInverse: false
+          isInverse: false,
+          isCenter:false
         }
       }
-      ImageFigures.push(<ImgFigure data={value} key={value.fileName} ref={'imageFigure' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}/>);
+      ImageFigures.push(<ImgFigure data={value} key={value.fileName} ref={'imageFigure' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)} />);
     });
 
     // console.log(ImageFigures);
