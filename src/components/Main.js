@@ -28,14 +28,14 @@ function get30DegRandom() {
 var ImgFigure = React.createClass({
   // 点击图片进行翻转
   handleClick(e) {
-    if(this.props.arrange.isCenter){
+    if (this.props.arrange.isCenter) {
       this.props.inverse();
-    }else{
+    } else {
       this.props.center();
     }
     e.stopPropagation();
     e.preventDefault();
-    
+
   },
   render() {
     var styleObj = {};
@@ -46,12 +46,12 @@ var ImgFigure = React.createClass({
     // 如果图片的旋转角度有值且不为零，添加旋转角度
     if (this.props.arrange.rotate) {
       // 兼容各种浏览器
-      (['-moz-', '-ms-', '-webkit-', '']).forEach(function (val) {
-        styleObj[val + 'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+      (['MozTransform', 'MsTransform', 'WebkitTransform', 'transform']).forEach(function (val) {
+        styleObj[val] = 'rotate(' + this.props.arrange.rotate + 'deg)';
       }.bind(this));
     }
-    if(this.props.arrange.isCenter){
-      styleObj.zIndex=11;
+    if (this.props.arrange.isCenter) {
+      styleObj.zIndex = 11;
     }
     var imgFigureClassName = 'img-figure';
     imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse' : '';
@@ -68,6 +68,39 @@ var ImgFigure = React.createClass({
     );
   }
 });
+
+// 添加controllerUnits控制组件
+class ControllerUnits extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick(e) {
+    // 如果点击的是当前正在选中态的按钮，则翻转图片，否则将对应的图片居中
+    if (this.props.arrange.isCenter) {
+      this.props.inverse();
+    } else {
+      this.props.center();
+    }
+    e.stopPropagation();
+    e.preventDefault();
+  }
+
+  render() {
+    let controllerUnitClassName = 'controller-unit';
+    // 如果对应的是居中图片，显示控制按钮的居中态
+    if (this.props.arrange.isCenter) {
+      controllerUnitClassName += ' is-center';
+      // 如果同时对应的是翻转图片，显示控制按钮的翻转态
+      if (this.props.arrange.isInverse) {
+        controllerUnitClassName += ' is-inverse';
+      }
+    }
+    return (
+      <span className={controllerUnitClassName} onClick={this.handleClick}></span>
+    );
+  }
+}
 class AppComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -119,11 +152,11 @@ class AppComponent extends React.Component {
   *@param index,需要被居中的图片对应的图片信息数组的index值
   *@return {function}
   */
- center(index){
-   return ()=>{
-   this.rerrange(index);
-   }
- }
+  center(index) {
+    return () => {
+      this.rerrange(index);
+    }
+  }
   /* 重新布局所有图片
     @param centerIndex指定居中排布哪个图片
   */
@@ -149,11 +182,11 @@ class AppComponent extends React.Component {
       // 声明数组对象用来存放中心图片位置信息
       imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex, 1);
     // 居中centerIndex的图片, 剧中图片centerIndex不需要旋转
-    imgsArrangeCenterArr[0] ={
-      pos:centerPos,
-      rotate:0,
-      isCenter:true
-    } 
+    imgsArrangeCenterArr[0] = {
+      pos: centerPos,
+      rotate: 0,
+      isCenter: true
+    }
     // 取出要布局上侧的图片状态信息
     topImgSpliceIndex = Math.floor(Math.random() * (imgsArrangeArr.length - imgTopNum));
     imgsArrangeTopArr = imgsArrangeArr.splice(topImgSpliceIndex, imgTopNum);
@@ -165,7 +198,7 @@ class AppComponent extends React.Component {
           left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
         },
         rotate: get30DegRandom(),
-        isCenter:false
+        isCenter: false
       }
     });
     // 布局左右两侧的图片
@@ -183,7 +216,7 @@ class AppComponent extends React.Component {
           left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
         },
         rotate: get30DegRandom(),
-        isCenter:false
+        isCenter: false
       }
     }
     // 填充上侧区域
@@ -238,7 +271,7 @@ class AppComponent extends React.Component {
 
   render() {
     // console.log(self);
-    var ImageFigures = [], ControllerUnits = [];
+    var ImageFigures = [], controllerUnits = [];
     // 为每一个imgFigure生成一个索引
     imagesData.forEach((value, index) => {
       // console.log(value);
@@ -251,17 +284,18 @@ class AppComponent extends React.Component {
           },
           rotate: 0,
           isInverse: false,
-          isCenter:false
+          isCenter: false
         }
       }
-      ImageFigures.push(<ImgFigure data={value} key={value.fileName} ref={'imageFigure' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)} />);
+      ImageFigures.push(<ImgFigure data={value} key={index} ref={'imageFigure' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)} />);
+      controllerUnits.push(<ControllerUnits key={index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)} />);
     });
 
     // console.log(ImageFigures);
     return (
       <section className="stage" ref="stage">
         <section className="img-sec">{ImageFigures}</section>
-        <nav className="controller-nav">{ControllerUnits}</nav>
+        <nav className="controller-nav">{controllerUnits}</nav>
       </section>
     );
   }
