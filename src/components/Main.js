@@ -25,8 +25,13 @@ function get30DegRandom() {
 }
 
 // let yeomanImage = require('../images/yeoman.png');
-var ImgFigure = React.createClass({
+// 添加图片组件
+class ImgFigure extends React.Component{
   // 点击图片进行翻转
+  constructor(props){
+    super(props);
+    this.handleClick=this.handleClick.bind(this);
+  }
   handleClick(e) {
     if (this.props.arrange.isCenter) {
       this.props.inverse();
@@ -36,7 +41,7 @@ var ImgFigure = React.createClass({
     e.stopPropagation();
     e.preventDefault();
 
-  },
+  }
   render() {
     var styleObj = {};
     // 如果props属性中指定了这张图片的位置，则使用
@@ -67,7 +72,7 @@ var ImgFigure = React.createClass({
       </figure>
     );
   }
-});
+}
 
 // 添加controllerUnits控制组件
 class ControllerUnits extends React.Component {
